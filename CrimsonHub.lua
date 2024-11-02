@@ -1872,8 +1872,8 @@ Player.Torso.Anchored = true
 
 end)
 
-local AffinityTab = AffinityHub:NewTab("Affinity")
-local AffinitySection = AffinityTab:NewSection("Auto Affy")
+local Tab = Window:NewTab("Affinity")
+local Section = AffinityTab:NewSection("Auto Affy")
 
 -- Adiciona um slider na seção "Auto Affy"
 AffinitySection:AddSlider({
