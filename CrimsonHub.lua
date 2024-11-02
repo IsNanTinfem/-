@@ -1876,15 +1876,15 @@ end)
 local Window = Library:CreateWindow("Affinity Hub")
 
 -- Cria a aba "Affinity" e a seção "Auto Affy" dentro dela
-local Tab = Window:NewTab("Affinity")
-local Section = Tab:NewSection("Auto Affy")
+local TabAffinity = Window:NewTab("Affinity")
+local SectionAffinity = TabAffinity:NewSection("Auto Affy")
 
 -- Variável para controle do estado do Auto Affy
 local autoAffyActive = false
 
 -- Adiciona o slider de Auto Affy na seção, com configuração para escalar de 1.0 a 2.0
 local sliderValue = 1.0 -- Valor inicial do slider
-Section:NewSlider("Auto Affy", "Adjust Affinity Level", 10, 20, function(value)
+SectionAffinity:NewSlider("Auto Affy", "Adjust Affinity Level", 10, 20, function(value)
     sliderValue = value / 10  -- Converte o valor do slider para a escala de 1.0 a 2.0
     print("Slider value:", sliderValue)
 end)
@@ -1944,7 +1944,7 @@ local function updateAffinity()
 end
 
 -- Botão para ativar/desativar o Auto Affy
-Section:NewToggle("Toggle Auto Affy", "Activate or deactivate auto affinity adjustment", function(state)
+SectionAffinity:NewToggle("Toggle Auto Affy", "Activate or deactivate auto affinity adjustment", function(state)
     autoAffyActive = state
     if autoAffyActive then
         while autoAffyActive do
@@ -1955,9 +1955,146 @@ Section:NewToggle("Toggle Auto Affy", "Activate or deactivate auto affinity adju
 end)
 
 -- Botão FastRoll que executa o updateAffinity 5 vezes
-Section:NewButton("FastRoll", "Executes the affinity update 5 times based on slider value", function()
+SectionAffinity:NewButton("FastRoll", "Executes the affinity update 5 times based on slider value", function()
     for i = 1, 5 do
         updateAffinity()
         wait(2) -- Espera 2 segundos entre cada execução
     end
+end)
+
+-- Cria a aba "Autos" e a seção correspondente
+local TabAutos = Window:NewTab("Autos")
+local SectionAutos = TabAutos:NewSection("Automation")
+
+-- Função para o script RollAffyTo2.0
+local function rollAffyTo2()
+    while wait(8) do
+        local player = game.Players.LocalPlayer
+        local playerId = player.UserId
+        local userDataName = game.Workspace.UserData["User_" .. playerId]
+
+        -- DFT1 Variables
+        local AffMelee1 = userDataName.Data.DFT1Melee.Value
+        local AffSniper1 = userDataName.Data.DFT1Sniper.Value
+        local AffDefense1 = userDataName.Data.DFT1Defense.Value
+        local AffSword1 = userDataName.Data.DFT1Sword.Value
+
+        -- DFT2 Variables
+        local AffMelee2 = userDataName.Data.DFT2Melee.Value
+        local AffSniper2 = userDataName.Data.DFT2Sniper.Value
+        local AffDefense2 = userDataName.Data.DFT2Defense.Value
+        local AffSword2 = userDataName.Data.DFT2Sword.Value
+
+        -- Check for DFT1
+        if AffSniper1 >= 2 and AffSword1 >= 2 and AffMelee1 >= 2 and AffDefense1 >= 2 then
+            script.Parent:Destroy()
+        end
+
+        -- Check for DFT2
+        if AffSniper2 >= 2 and AffSword2 >= 2 and AffMelee2 >= 2 and AffDefense2 >= 2 then
+            script.Parent:Destroy()
+        end
+
+        local args1 = {
+            [1] = "DFT1",
+            [2] = false,  -- defense
+            [3] = false,  -- melee
+            [4] = false,  -- sniper
+            [5] = false,  -- sword
+            [6] = "Gems"
+        }
+
+        local args2 = {
+            [1] = "DFT2",
+            [2] = false,  -- defense
+            [3] = false,  -- melee
+            [4] = false,  -- sniper
+            [5] = false,  -- sword
+            [6] = "Gems"
+        }
+
+        if AffDefense1 == 2 then
+            args1[2] = 0/0
+        end
+
+        if AffMelee1 == 2 then
+            args1[3] = 0/0
+        end
+
+        if AffSniper1 == 2 then
+            args1[4] = 0/0
+        end
+
+        if AffSword1 == 2 then
+            args1[5] = 0/0
+        end
+
+        if AffDefense2 == 2 then
+            args2[2] = 0/0
+        end
+
+        if AffMelee2 == 2 then
+            args2[3] = 0/0
+        end
+
+        if AffSniper2 == 2 then
+            args2[4] = 0/0
+        end
+
+        if AffSword2 == 2 then
+            args2[5] = 0/0
+        end
+
+        workspace:WaitForChild("Merchants"):WaitForChild("AffinityMerchant"):WaitForChild("Clickable"):WaitForChild("Retum"):FireServer(unpack(args1))
+        workspace:WaitForChild("Merchants"):WaitForChild("AffinityMerchant"):WaitForChild("Clickable"):WaitForChild("Retum"):FireServer(unpack(args2))
+    end
+end
+
+-- Botão para ativar o RollAffyTo2.0
+SectionAutos:NewButton("RollAffyTo2.0", "Start rolling affinities to 2.0", function()
+    rollAffyTo2()
+end)
+
+-- Função para o script Auto Haki Farm
+local function autoHakiFarm()
+    -- Obtém a instância do jogador local
+    local player = game:GetService("Players").LocalPlayer
+    local GeneratedUserString = "User_" .. player.UserId
+
+    -- Variável global para controlar a fazenda
+    getgenv().farm = true -- true para habilitar, false para desabilitar
+
+    -- Função para obter a barra de vida do jogador
+    local function getHealthBar()
+        local healthBar = player:WaitForChild("PlayerGui"):WaitForChild("HealthBar", 5) -- Espera até encontrar a barra de vida
+        return healthBar.Frame.Haki.Frame.Min.Value, healthBar.Frame.Haki.Frame.Max.Value
+    end
+
+    -- Laço para realizar a fazenda
+    while getgenv().farm do
+        wait(0.025)
+        local minValue, maxValue = getHealthBar()
+
+        -- Repete até que a vida mínima seja menor ou igual a 300 ou até que a fazenda seja desabilitada
+        while minValue > 50 and getgenv().farm do
+            wait()
+            spawn(function()
+                workspace.UserData[GeneratedUserString].III:FireServer("On", 1)
+                wait(0.025)
+                workspace.UserData[GeneratedUserString].III:FireServer("Off", 1)
+            end)
+            minValue, maxValue = getHealthBar()
+        end
+
+        -- Espera até que a vida mínima seja igual à máxima ou até que a fazenda seja desabilitada
+        repeat
+            wait()
+            minValue, maxValue = getHealthBar()
+        until minValue == maxValue or not getgenv().farm
+    end
+end
+
+-- Botão para ativar o Auto Haki Farm
+SectionAutos:NewButton("Auto Haki Farm", "Start auto farming haki", function()
+    autoHakiFarm()
 end)
