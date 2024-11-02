@@ -1872,30 +1872,27 @@ Player.Torso.Anchored = true
 
 end)
 
--- Cria a janela principal do Hub
-local Window = Library:CreateWindow("Affinity Hub")
-
--- Cria a aba "Affinity" e a seção "Auto Affy" dentro dela
+-- Cria a aba "Affinity" e a seção "Auto Affy"
 local TabAffinity = Window:NewTab("Affinity")
 local SectionAffinity = TabAffinity:NewSection("Auto Affy")
 
 -- Variável para controle do estado do Auto Affy
 local autoAffyActive = false
-
--- Adiciona o slider de Auto Affy na seção, com configuração para escalar de 1.0 a 2.0
 local sliderValue = 1.0 -- Valor inicial do slider
+
+-- Adiciona o slider de Auto Affy na seção
 SectionAffinity:NewSlider("Auto Affy", "Adjust Affinity Level", 10, 20, function(value)
     sliderValue = value / 10  -- Converte o valor do slider para a escala de 1.0 a 2.0
     print("Slider value:", sliderValue)
 end)
 
--- Função que utiliza o valor do slider para ajustar afinidades
+-- Função para atualizar afinidade
 local function updateAffinity()
     local player = game.Players.LocalPlayer
     if player then
         local playerId = player.UserId
         local userData = game.Workspace.UserData["User_" .. playerId]
-        
+
         if userData and userData.Data then
             -- DFT1 Variables
             local AffMelee1 = userData.Data.DFT1Melee.Value
@@ -1963,8 +1960,8 @@ SectionAffinity:NewButton("FastRoll", "Executes the affinity update 5 times base
 end)
 
 -- Cria a aba "Autos" e a seção correspondente
-local TabAutos = Window:NewTab("Autos")
-local SectionAutos = TabAutos:NewSection("Automation")
+local Tab = Window:NewTab("Autos")
+local Section = Tab:NewSection("Automation")
 
 -- Função para o script RollAffyTo2.0
 local function rollAffyTo2()
@@ -2051,7 +2048,7 @@ local function rollAffyTo2()
 end
 
 -- Botão para ativar o RollAffyTo2.0
-SectionAutos:NewButton("RollAffyTo2.0", "Start rolling affinities to 2.0", function()
+Section:NewButton("RollAffyTo2.0", "Start rolling affinities to 2.0", function()
     rollAffyTo2()
 end)
 
@@ -2074,27 +2071,17 @@ local function autoHakiFarm()
     while getgenv().farm do
         wait(0.025)
         local minValue, maxValue = getHealthBar()
-
-        -- Repete até que a vida mínima seja menor ou igual a 300 ou até que a fazenda seja desabilitada
-        while minValue > 50 and getgenv().farm do
-            wait()
-            spawn(function()
-                workspace.UserData[GeneratedUserString].III:FireServer("On", 1)
-                wait(0.025)
-                workspace.UserData[GeneratedUserString].III:FireServer("Off", 1)
-            end)
-            minValue, maxValue = getHealthBar()
+        
+        -- Repete até que a vida mínima seja menor ou igual a 300 ou o máximo maior que 3000
+        if minValue <= 300 or maxValue > 3000 then
+            return
         end
 
-        -- Espera até que a vida mínima seja igual à máxima ou até que a fazenda seja desabilitada
-        repeat
-            wait()
-            minValue, maxValue = getHealthBar()
-        until minValue == maxValue or not getgenv().farm
+        -- Adicione a lógica de farming aqui...
     end
 end
 
--- Botão para ativar o Auto Haki Farm
-SectionAutos:NewButton("Auto Haki Farm", "Start auto farming haki", function()
+-- Botão para ativar a fazenda de Haki
+Section:NewButton("Auto Haki Farm", "Start farming Haki", function()
     autoHakiFarm()
 end)
