@@ -1873,62 +1873,51 @@ Player.Torso.Anchored = true
 end)
 
 local Tab = Window:NewTab("Affinity")
-local Section = AffinityTab:NewSection("Auto Affy")
+local Section = Tab:NewSection("Auto Affy")
 
--- Adiciona um slider na seção "Auto Affy"
-AffinitySection:AddSlider({
-    Name = "Auto Affy",
-    Min = 10,  -- Valor mínimo (representando 1.0)
-    Max = 20,  -- Valor máximo (representando 2.0)
-    Default = 10,  -- Valor inicial (10/10, representando 1.0)
-    Color = Color3.fromRGB(255, 255, 255),
-    Increment = 1,  -- Incremento de 1 unidade para que cada valor represente 0.1
-    ValueName = "x0.1",  -- Indica que o valor será multiplicado por 0.1
-    Callback = function(Value)
-        local sliderValue = Value / 10  -- Converte o valor para a escala de 1.0 a 2.0
-        print("Slider value:", sliderValue)
+-- Adiciona o slider de Auto Affy na seção, com configuração para escalar de 1.0 a 2.0
+Section:NewSlider("Auto Affy", "Adjust Affinity Level", 10, 20, function(value)
+    local sliderValue = value / 10  -- Converte o valor do slider para a escala de 1.0 a 2.0
+    print("Slider value:", sliderValue)
 
-        -- Script de Auto Affy adaptado para usar o valor do slider
-        while wait(8) do
-            local player = game.Players.LocalPlayer
-            if player then
-                local playerId = player.UserId
-                local userDataName = game.Workspace.UserData["User_" .. playerId]
-                if userDataName and userDataName.Data then
-                    -- Obtém os valores de afinidade do jogador
-                    local AffMelee1 = userDataName.Data.DFT1Melee.Value
-                    local AffSniper1 = userDataName.Data.DFT1Sniper.Value
-                    local AffDefense1 = userDataName.Data.DFT1Defense.Value
-                    local AffSword1 = userDataName.Data.DFT1Sword.Value
-                    
-                    -- Condições baseadas no valor do slider
-                    if (AffSniper1 >= sliderValue or AffSniper1 == 2) and
-                       (AffSword1 >= sliderValue or AffSword1 == 2) and
-                       (AffMelee1 >= sliderValue or AffMelee1 == 2) and
-                       (AffDefense1 >= sliderValue or AffDefense1 == 2) then
-                        script.Parent:Destroy()
-                    end
-
-                    -- Configura argumentos para atualizar afinidades
-                    local args1 = {
-                        [1] = "DFT1",
-                        [2] = false,  -- Defesa
-                        [3] = false,  -- Corpo a corpo
-                        [4] = false,  -- Franco-atirador
-                        [5] = false,  -- Espada
-                        [6] = "Gems"
-                    }
-
-                    -- Ajusta cada afinidade com base no valor do slider
-                    if AffDefense1 >= sliderValue then args1[2] = 0/0 end
-                    if AffMelee1 >= sliderValue then args1[3] = 0/0 end
-                    if AffSniper1 >= sliderValue then args1[4] = 0/0 end
-                    if AffSword1 >= sliderValue then args1[5] = 0/0 end
-
-                    -- Dispara o evento do servidor com os novos valores
-                    workspace:WaitForChild("Merchants"):WaitForChild("AffinityMerchant"):WaitForChild("Clickable"):WaitForChild("Retum"):FireServer(unpack(args1))
+    -- Função que utiliza o valor do slider para ajustar afinidades
+    local function updateAffinity()
+        local player = game.Players.LocalPlayer
+        if player then
+            local playerId = player.UserId
+            local userData = game.Workspace.UserData["User_" .. playerId]
+            
+            if userData and userData.Data then
+                local AffMelee = userData.Data.DFT1Melee.Value
+                local AffSniper = userData.Data.DFT1Sniper.Value
+                local AffDefense = userData.Data.DFT1Defense.Value
+                local AffSword = userData.Data.DFT1Sword.Value
+                
+                -- Condição para destruir a UI quando os valores atingirem o limite
+                if (AffSniper >= sliderValue or AffSniper == 2) and
+                   (AffSword >= sliderValue or AffSword == 2) and
+                   (AffMelee >= sliderValue or AffMelee == 2) and
+                   (AffDefense >= sliderValue or AffDefense == 2) then
+                    script.Parent:Destroy()
                 end
+
+                -- Argumentos para enviar ao servidor com base na afinidade
+                local args = {
+                    [1] = "DFT1",
+                    [2] = AffDefense >= sliderValue and 0/0 or false,
+                    [3] = AffMelee >= sliderValue and 0/0 or false,
+                    [4] = AffSniper >= sliderValue and 0/0 or false,
+                    [5] = AffSword >= sliderValue and 0/0 or false,
+                    [6] = "Gems"
+                }
+
+                workspace:WaitForChild("Merchants"):WaitForChild("AffinityMerchant"):WaitForChild("Clickable"):WaitForChild("Retum"):FireServer(unpack(args))
             end
         end
     end
-})
+
+    -- Executa a função de afinidade periodicamente com o valor do slider
+    while wait(8) do
+        updateAffinity()
+    end
+end)
