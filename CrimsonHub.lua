@@ -1875,49 +1875,68 @@ end)
 local Tab = Window:NewTab("Affinity")
 local Section = Tab:NewSection("Auto Affy")
 
--- Adiciona o slider de Auto Affy na seção, com configuração para escalar de 1.0 a 2.0
-Section:NewSlider("Auto Affy", "Adjust Affinity Level", 10, 20, function(value)
-    local sliderValue = value / 10  -- Converte o valor do slider para a escala de 1.0 a 2.0
-    print("Slider value:", sliderValue)
+-- Variável para controlar o estado do Auto Affy
+local autoAffyEnabled = false
+local sliderValue = 1.0  -- Valor inicial padrão do slider
 
-    -- Função que utiliza o valor do slider para ajustar afinidades
-    local function updateAffinity()
+-- Adiciona o slider de Auto Affy na seção, com configuração para escalar de 1.0 a 2.0
+Section:NewSlider("Affinity Level", "Adjust Affinity Level", 10, 20, function(value)
+    sliderValue = value / 10  -- Converte o valor do slider para a escala de 1.0 a 2.0
+    print("Slider value:", sliderValue)
+end)
+
+-- Função para ajustar afinidades usando o valor do slider
+local function autoAffy()
+    while autoAffyEnabled do
         local player = game.Players.LocalPlayer
         if player then
             local playerId = player.UserId
-            local userData = game.Workspace.UserData["User_" .. playerId]
+            local userDataName = game.Workspace.UserData["User_" .. playerId]
             
-            if userData and userData.Data then
-                local AffMelee = userData.Data.DFT1Melee.Value
-                local AffSniper = userData.Data.DFT1Sniper.Value
-                local AffDefense = userData.Data.DFT1Defense.Value
-                local AffSword = userData.Data.DFT1Sword.Value
+            if userDataName and userDataName.Data then
+                -- Variáveis de afinidade para DFT1 e DFT2
+                local AffMelee1 = userDataName.Data.DFT1Melee.Value
+                local AffSniper1 = userDataName.Data.DFT1Sniper.Value
+                local AffDefense1 = userDataName.Data.DFT1Defense.Value
+                local AffSword1 = userDataName.Data.DFT1Sword.Value
                 
-                -- Condição para destruir a UI quando os valores atingirem o limite
-                if (AffSniper >= sliderValue or AffSniper == 2) and
-                   (AffSword >= sliderValue or AffSword == 2) and
-                   (AffMelee >= sliderValue or AffMelee == 2) and
-                   (AffDefense >= sliderValue or AffDefense == 2) then
+                local AffMelee2 = userDataName.Data.DFT2Melee.Value
+                local AffSniper2 = userDataName.Data.DFT2Sniper.Value
+                local AffDefense2 = userDataName.Data.DFT2Defense.Value
+                local AffSword2 = userDataName.Data.DFT2Sword.Value
+
+                -- Condição para destruir a UI se as afinidades atingirem ou ultrapassarem o limite
+                if (AffSniper1 >= sliderValue and AffSword1 >= sliderValue and
+                    AffMelee1 >= sliderValue and AffDefense1 >= sliderValue) then
                     script.Parent:Destroy()
                 end
 
-                -- Argumentos para enviar ao servidor com base na afinidade
-                local args = {
-                    [1] = "DFT1",
-                    [2] = AffDefense >= sliderValue and 0/0 or false,
-                    [3] = AffMelee >= sliderValue and 0/0 or false,
-                    [4] = AffSniper >= sliderValue and 0/0 or false,
-                    [5] = AffSword >= sliderValue and 0/0 or false,
-                    [6] = "Gems"
-                }
+                if (AffSniper2 >= sliderValue and AffSword2 >= sliderValue and
+                    AffMelee2 >= sliderValue and AffDefense2 >= sliderValue) then
+                    script.Parent:Destroy()
+                end
 
-                workspace:WaitForChild("Merchants"):WaitForChild("AffinityMerchant"):WaitForChild("Clickable"):WaitForChild("Retum"):FireServer(unpack(args))
+                -- Argumentos para enviar ao servidor com base nas afinidades e no valor do slider
+                local args1 = {"DFT1", AffDefense1 >= sliderValue and 0/0 or false, AffMelee1 >= sliderValue and 0/0 or false, AffSniper1 >= sliderValue and 0/0 or false, AffSword1 >= sliderValue and 0/0 or false, "Gems"}
+                local args2 = {"DFT2", AffDefense2 >= sliderValue and 0/0 or false, AffMelee2 >= sliderValue and 0/0 or false, AffSniper2 >= sliderValue and 0/0 or false, AffSword2 >= sliderValue and 0/0 or false, "Gems"}
+
+                -- Envia os argumentos ao servidor
+                workspace:WaitForChild("Merchants"):WaitForChild("AffinityMerchant"):WaitForChild("Clickable"):WaitForChild("Retum"):FireServer(unpack(args1))
+                workspace:WaitForChild("Merchants"):WaitForChild("AffinityMerchant"):WaitForChild("Clickable"):WaitForChild("Retum"):FireServer(unpack(args2))
             end
         end
+        wait(8)  -- Intervalo de 8 segundos entre as verificações
     end
+end
 
-    -- Executa a função de afinidade periodicamente com o valor do slider
-    while wait(8) do
-        updateAffinity()
+-- Botão para ativar/desativar o Auto Affy
+Section:NewButton("Toggle Auto Affy", "Start or Stop Auto Affy", function()
+    autoAffyEnabled = not autoAffyEnabled  -- Alterna o estado
+
+    if autoAffyEnabled then
+        print("Auto Affy activated.")
+        spawn(autoAffy)  -- Inicia o processo de Auto Affy em uma nova thread
+    else
+        print("Auto Affy deactivated.")
     end
 end)
