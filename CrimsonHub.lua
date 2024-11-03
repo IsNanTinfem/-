@@ -1704,15 +1704,24 @@ print(plyn , ues , df2)
 
 end)
 
-
+------
+-- Cria a seção "God Eyes" e adiciona o botão de "All Seeing Eye"
 local Section = Tab:NewSection("God Eyes")
-Section:NewButton("Unlimid Username Distance", "All Seeing Eye", function()
-    
-	for i,v in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
-	game.Players.LocalPlayer.Character.Humanoid.NameDisplayDistance = 100000000000
 
-	end
+-- Botão para ativar a visão ilimitada de nomes
+Section:NewButton("Unlimid Username Distance", "All Seeing Eye", function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait() -- Garante que o personagem está carregado
+
+    -- Define a distância do nome e a visibilidade para todos os humanoides no jogo
+    for _, v in pairs(game.Workspace:GetDescendants()) do
+        if v:IsA("Humanoid") then
+            v.NameDisplayDistance = 1e8 -- Define a distância máxima para exibir o nome
+            v.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None -- Mostra o nome sempre, mesmo atrás de objetos
+        end
+    end
 end)
+------
 
 local Section = Tab:NewSection("Infinite Yield")
 Section:NewButton("Run Infinite Yield", "???", function()
@@ -2087,6 +2096,8 @@ Section:NewButton("Auto Haki Farm", "Start farming Haki", function()
 end)
 
 -- Função para matar jogadores
+local Section = Tab:NewSection("Farm Kill")
+
 Section:NewButton("Kill Player", function()
     local LP = game.Players.LocalPlayer
     local RunService = game:GetService("RunService")
