@@ -2001,7 +2001,7 @@ Section:NewButton("Kill Player", "Kills all players", function()
 end)
 
 -- Função para matar NPCs
-Section:NewButton("Kill Npc", "Kills all NPCs", function()
+Section:NewButton("Kill NPC", "Kills all NPCs", function()
     local LP = game.Players.LocalPlayer
     local RunService = game:GetService("RunService")
 
