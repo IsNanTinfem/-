@@ -1705,22 +1705,24 @@ print(plyn , ues , df2)
 end)
 
 ------
--- Cria a seção "God Eyes" e adiciona o botão de "All Seeing Eye"
+-- Cria a aba "God Eyes" e a seção correspondente
 local Section = Tab:NewSection("God Eyes")
 
 -- Botão para ativar a visão ilimitada de nomes
 Section:NewButton("Unlimid Username Distance", "All Seeing Eye", function()
+    -- Certifica-se de que o jogador e o personagem estão prontos
     local player = game.Players.LocalPlayer
-    local character = player.Character or player.CharacterAdded:Wait() -- Garante que o personagem está carregado
+    local character = player.Character or player.CharacterAdded:Wait()
 
-    -- Define a distância do nome e a visibilidade para todos os humanoides no jogo
+    -- Configura todos os humanoides no Workspace para mostrar os nomes
     for _, v in pairs(game.Workspace:GetDescendants()) do
-        if v:IsA("Humanoid") then
+        if v:IsA("Humanoid") and v.Parent:FindFirstChild("Head") then
             v.NameDisplayDistance = 1e8 -- Define a distância máxima para exibir o nome
-            v.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None -- Mostra o nome sempre, mesmo atrás de objetos
+            v.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.Viewer -- Sempre visível para o jogador
         end
     end
 end)
+
 ------
 
 local Section = Tab:NewSection("Infinite Yield")
