@@ -1736,7 +1736,33 @@ Section:NewButton("Enable Wall Vision", "See Names Through Walls", function()
 end)
 
 ------
+local Section = Tab:NewSection("Jesus Mode")
 
+-- Variável para armazenar o estado do Jesus Mode
+local jesusModeEnabled = false
+
+-- Botão para ativar o Jesus Mode
+Section:NewButton("Toggle Jesus Mode", "Walk on Water Without Taking Damage", function()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+
+    jesusModeEnabled = not jesusModeEnabled -- Alterna o estado
+
+    if jesusModeEnabled then
+        -- Ativa o Jesus Mode
+        character.HumanoidRootPart.Anchored = true -- Impede que o personagem caia na água
+        humanoid.PlatformStand = true -- Impede que o personagem se mova para baixo
+        print("Jesus Mode Activated")
+    else
+        -- Desativa o Jesus Mode
+        character.HumanoidRootPart.Anchored = false -- Permite que o personagem caia normalmente
+        humanoid.PlatformStand = false -- Permite que o personagem se mova normalmente
+        print("Jesus Mode Deactivated")
+    end
+end)
+
+------
 local Section = Tab:NewSection("Infinite Yield")
 Section:NewButton("Run Infinite Yield", "???", function()
     
