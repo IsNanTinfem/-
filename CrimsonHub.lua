@@ -1882,15 +1882,15 @@ Player.Torso.Anchored = true
 end)
 
 -- Cria a aba "Affinity" e a seção "Auto Affy"
-local TabAffinity = Window:NewTab("Affinity")
-local SectionAffinity = TabAffinity:NewSection("Auto Affy")
+local Tab = Window:NewTab("Affinity")
+local Section = Tab:NewSection("Auto Affy")
 
 -- Variável para controle do estado do Auto Affy
 local autoAffyActive = false
 local sliderValue = 1.0 -- Valor inicial do slider
 
 -- Adiciona o slider de Auto Affy na seção
-SectionAffinity:NewSlider("Auto Affy", "Adjust Affinity Level", 10, 20, function(value)
+Section:NewSlider("Auto Affy", "Adjust Affinity Level", 10, 20, function(value)
     sliderValue = value / 10  -- Converte o valor do slider para a escala de 1.0 a 2.0
     print("Slider value:", sliderValue)
 end)
@@ -1950,7 +1950,7 @@ local function updateAffinity()
 end
 
 -- Botão para ativar/desativar o Auto Affy
-SectionAffinity:NewToggle("Toggle Auto Affy", "Activate or deactivate auto affinity adjustment", function(state)
+Section:NewToggle("Toggle Auto Affy", "Activate or deactivate auto affinity adjustment", function(state)
     autoAffyActive = state
     if autoAffyActive then
         while autoAffyActive do
@@ -1961,144 +1961,19 @@ SectionAffinity:NewToggle("Toggle Auto Affy", "Activate or deactivate auto affin
 end)
 
 -- Botão FastRoll que executa o updateAffinity 5 vezes
-SectionAffinity:NewButton("FastRoll", "Executes the affinity update 5 times based on slider value", function()
+Section:NewButton("FastRoll", "Executes the affinity update 5 times based on slider value", function()
     for i = 1, 5 do
         updateAffinity()
         wait(2) -- Espera 2 segundos entre cada execução
     end
 end)
 
--- Cria a aba "Autos" e a seção correspondente
-local Tab = Window:NewTab("Autos")
-local Section = Tab:NewSection("Automation")
-
--- Função para o script RollAffyTo2.0
-local function rollAffyTo2()
-    while wait(8) do
-        local player = game.Players.LocalPlayer
-        local playerId = player.UserId
-        local userDataName = game.Workspace.UserData["User_" .. playerId]
-
-        -- DFT1 Variables
-        local AffMelee1 = userDataName.Data.DFT1Melee.Value
-        local AffSniper1 = userDataName.Data.DFT1Sniper.Value
-        local AffDefense1 = userDataName.Data.DFT1Defense.Value
-        local AffSword1 = userDataName.Data.DFT1Sword.Value
-
-        -- DFT2 Variables
-        local AffMelee2 = userDataName.Data.DFT2Melee.Value
-        local AffSniper2 = userDataName.Data.DFT2Sniper.Value
-        local AffDefense2 = userDataName.Data.DFT2Defense.Value
-        local AffSword2 = userDataName.Data.DFT2Sword.Value
-
-        -- Check for DFT1
-        if AffSniper1 >= 2 and AffSword1 >= 2 and AffMelee1 >= 2 and AffDefense1 >= 2 then
-            script.Parent:Destroy()
-        end
-
-        -- Check for DFT2
-        if AffSniper2 >= 2 and AffSword2 >= 2 and AffMelee2 >= 2 and AffDefense2 >= 2 then
-            script.Parent:Destroy()
-        end
-
-        local args1 = {
-            [1] = "DFT1",
-            [2] = false,  -- defense
-            [3] = false,  -- melee
-            [4] = false,  -- sniper
-            [5] = false,  -- sword
-            [6] = "Gems"
-        }
-
-        local args2 = {
-            [1] = "DFT2",
-            [2] = false,  -- defense
-            [3] = false,  -- melee
-            [4] = false,  -- sniper
-            [5] = false,  -- sword
-            [6] = "Gems"
-        }
-
-        if AffDefense1 == 2 then
-            args1[2] = 0/0
-        end
-
-        if AffMelee1 == 2 then
-            args1[3] = 0/0
-        end
-
-        if AffSniper1 == 2 then
-            args1[4] = 0/0
-        end
-
-        if AffSword1 == 2 then
-            args1[5] = 0/0
-        end
-
-        if AffDefense2 == 2 then
-            args2[2] = 0/0
-        end
-
-        if AffMelee2 == 2 then
-            args2[3] = 0/0
-        end
-
-        if AffSniper2 == 2 then
-            args2[4] = 0/0
-        end
-
-        if AffSword2 == 2 then
-            args2[5] = 0/0
-        end
-
-        workspace:WaitForChild("Merchants"):WaitForChild("AffinityMerchant"):WaitForChild("Clickable"):WaitForChild("Retum"):FireServer(unpack(args1))
-        workspace:WaitForChild("Merchants"):WaitForChild("AffinityMerchant"):WaitForChild("Clickable"):WaitForChild("Retum"):FireServer(unpack(args2))
-    end
-end
-
--- Botão para ativar o RollAffyTo2.0
-Section:NewButton("RollAffyTo2.0", "Start rolling affinities to 2.0", function()
-    rollAffyTo2()
-end)
-
--- Função para o script Auto Haki Farm
-local function autoHakiFarm()
-    -- Obtém a instância do jogador local
-    local player = game:GetService("Players").LocalPlayer
-    local GeneratedUserString = "User_" .. player.UserId
-
-    -- Variável global para controlar a fazenda
-    getgenv().farm = true -- true para habilitar, false para desabilitar
-
-    -- Função para obter a barra de vida do jogador
-    local function getHealthBar()
-        local healthBar = player:WaitForChild("PlayerGui"):WaitForChild("HealthBar", 5) -- Espera até encontrar a barra de vida
-        return healthBar.Frame.Haki.Frame.Min.Value, healthBar.Frame.Haki.Frame.Max.Value
-    end
-
-    -- Laço para realizar a fazenda
-    while getgenv().farm do
-        wait(0.025)
-        local minValue, maxValue = getHealthBar()
-        
-        -- Repete até que a vida mínima seja menor ou igual a 300 ou o máximo maior que 3000
-        if minValue <= 300 or maxValue > 3000 then
-            return
-        end
-
-        -- Adicione a lógica de farming aqui...
-    end
-end
-
--- Botão para ativar a fazenda de Haki
-Section:NewButton("Auto Haki Farm", "Start farming Haki", function()
-    autoHakiFarm()
-end)
+-- Cria a aba "Farm Kill" e a seção correspondente
+local Tab = Window:NewTab("Farm Kill")
+local Section = Tab:NewSection("Player and NPC Farm")
 
 -- Função para matar jogadores
-local Section = Tab:NewSection("Farm Kill")
-
-Section:NewButton("Kill Player", function()
+Section:NewButton("Kill Player", "Kills all players", function()
     local LP = game.Players.LocalPlayer
     local RunService = game:GetService("RunService")
 
@@ -2111,12 +1986,12 @@ Section:NewButton("Kill Player", function()
 
     -- Ataca todos os jogadores no workspace
     RunService.Heartbeat:Connect(function()
-        for _, v in pairs(workspace:GetChildren()) do
-            if v:FindFirstChild("HumanoidRootPart") then
-                v.HumanoidRootPart.Anchored = true
-                v.HumanoidRootPart.CFrame = LP.Character.HumanoidRootPart.CFrame * CFrame.new(0, 10, 0)
+        for _, v in pairs(game.Players:GetPlayers()) do
+            if v ~= LP and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
+                v.Character.HumanoidRootPart.Anchored = true
+                v.Character.HumanoidRootPart.CFrame = LP.Character.HumanoidRootPart.CFrame * CFrame.new(0, 10, 0)
                 if LP.Character:FindFirstChild("Cannon Ball") then
-                    local args = { v.HumanoidRootPart.CFrame }
+                    local args = { v.Character.HumanoidRootPart.CFrame }
                     LP.Character["Cannon Ball"].RemoteEvent:FireServer(unpack(args))
                     wait(1)
                 end
@@ -2126,7 +2001,7 @@ Section:NewButton("Kill Player", function()
 end)
 
 -- Função para matar NPCs
-Section:NewButton("Kill Npc", function()
+Section:NewButton("Kill Npc", "Kills all NPCs", function()
     local LP = game.Players.LocalPlayer
     local RunService = game:GetService("RunService")
 
