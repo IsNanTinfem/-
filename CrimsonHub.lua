@@ -2085,64 +2085,58 @@ end
 Section:NewButton("Auto Haki Farm", "Start farming Haki", function()
     autoHakiFarm()
 end)
----------------------------------------------------
-local Tab = Window:NewTab("Autos")
-local Section = Tab:NewSection("Farm Kill")
 
+-- Função para matar jogadores
 Section:NewButton("Kill Player", function()
+    local LP = game.Players.LocalPlayer
+    local RunService = game:GetService("RunService")
 
-        local LP = game.Players.LocalPlayer
-local RunService = game:GetService("RunService")
+    -- Equipar a ferramenta "Cannon Ball" se estiver no Backpack
+    RunService.Heartbeat:Connect(function()
+        if LP.Backpack:FindFirstChild("Cannon Ball") and not LP.Character:FindFirstChild("Cannon Ball") then
+            LP.Character.Humanoid:EquipTool(LP.Backpack["Cannon Ball"])
+        end
+    end)
 
-RunService.Heartbeat:Connect(function()
-    if LP.Backpack:FindFirstChild("Cannon Ball") and not LP.Character:FindFirstChild("Cannon Ball") then
-        LP.Character.Humanoid:EquipTool(LP.Backpack["Cannon Ball"])
-    end
-end)
-
-RunService.Heartbeat:Connect(function()
-    for _, v in pairs(workspace:GetChildren()) do
-        if v:FindFirstChild("HumanoidRootPart") then
-            v.HumanoidRootPart.Anchored = true
-            v.HumanoidRootPart.CFrame = LP.Character.HumanoidRootPart.CFrame * CFrame.new(0, 10, 0)
-            if LP.Character:FindFirstChild("Cannon Ball") then
-                local args = {
-                    [1] = v.HumanoidRootPart.CFrame
-                }
-                LP.Character["Cannon Ball"].RemoteEvent:FireServer(unpack(args))
-                wait(1) -- Espera de 1 segundo após o ataque
+    -- Ataca todos os jogadores no workspace
+    RunService.Heartbeat:Connect(function()
+        for _, v in pairs(workspace:GetChildren()) do
+            if v:FindFirstChild("HumanoidRootPart") then
+                v.HumanoidRootPart.Anchored = true
+                v.HumanoidRootPart.CFrame = LP.Character.HumanoidRootPart.CFrame * CFrame.new(0, 10, 0)
+                if LP.Character:FindFirstChild("Cannon Ball") then
+                    local args = { v.HumanoidRootPart.CFrame }
+                    LP.Character["Cannon Ball"].RemoteEvent:FireServer(unpack(args))
+                    wait(1)
+                end
             end
         end
-    end
+    end)
 end)
 
+-- Função para matar NPCs
 Section:NewButton("Kill Npc", function()
+    local LP = game.Players.LocalPlayer
+    local RunService = game:GetService("RunService")
 
-local LP = game.Players.LocalPlayer
-local RunService = game:GetService("RunService")
+    -- Equipar a ferramenta "Cannon Ball" se estiver no Backpack
+    RunService.Heartbeat:Connect(function()
+        if LP.Backpack:FindFirstChild("Cannon Ball") and not LP.Character:FindFirstChild("Cannon Ball") then
+            LP.Character.Humanoid:EquipTool(LP.Backpack["Cannon Ball"])
+        end
+    end)
 
--- Loop que equipa continuamente a ferramenta "Cannon Ball"
-RunService.Heartbeat:Connect(function()
-    if LP.Backpack:FindFirstChild("Cannon Ball") and not LP.Character:FindFirstChild("Cannon Ball") then
-        LP.Character.Humanoid:EquipTool(LP.Backpack["Cannon Ball"])
-    end
-end)
-
--- Loop que trata dos inimigos
-RunService.Heartbeat:Connect(function()
-    for _, v in pairs(workspace.Enemies:GetChildren()) do
-        if v:FindFirstChild("HumanoidRootPart") then
-            v.HumanoidRootPart.Anchored = true
-            v.HumanoidRootPart.CFrame = LP.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, -10)
-            if LP.Character:FindFirstChild("Cannon Ball") then
-                local args = {
-                    [1] = v.HumanoidRootPart.CFrame
-                }
-                game:GetService("Players").LocalPlayer.Character["Cannon Ball"].RemoteEvent:FireServer(unpack(args))
+    -- Ataca todos os NPCs no workspace.Enemies
+    RunService.Heartbeat:Connect(function()
+        for _, v in pairs(workspace.Enemies:GetChildren()) do
+            if v:FindFirstChild("HumanoidRootPart") then
+                v.HumanoidRootPart.Anchored = true
+                v.HumanoidRootPart.CFrame = LP.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, -10)
+                if LP.Character:FindFirstChild("Cannon Ball") then
+                    local args = { v.HumanoidRootPart.CFrame }
+                    LP.Character["Cannon Ball"].RemoteEvent:FireServer(unpack(args))
+                end
             end
         end
-    end
-end)
-end)
-		
+    end)
 end)
