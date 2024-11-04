@@ -1708,29 +1708,35 @@ end)
 -- Cria a seção "God Eyes" --
 local Section = Tab:NewSection("God Eyes")
 
--- Função para aplicar a invisibilidade nos objetos
-local function applyInvisibility()
+-- Função para aplicar a visibilidade nos humanoides
+local function applyVisibility()
     for _, v in pairs(game.Workspace:GetDescendants()) do
-        if v:IsA("BasePart") then
-            v.Transparency = 1 -- Torna o objeto invisível
-            v.CanCollide = false -- Desativa a colisão
+        if v:IsA("Humanoid") and v.Parent:FindFirstChild("Head") then
+            v.NameDisplayDistance = 1e8 -- Define a distância máxima para exibir o nome
+            v.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None -- Sempre visível, mesmo atrás de objetos
         end
     end
 end
 
--- Botão para ativar a visão através das paredes
-Section:NewButton("Enable Wall Vision", "See Names Through Walls", function()
+-- Botão para ativar a visão ilimitada de nomes
+Section:NewButton("Unlimid Username Distance", "All Seeing Eye", function()
     -- Certifica-se de que o jogador e o personagem estão prontos
     local player = game.Players.LocalPlayer
     local character = player.Character or player.CharacterAdded:Wait()
 
-    -- Aplica invisibilidade inicial
-    applyInvisibility()
+    -- Aplica visibilidade inicial
+    applyVisibility()
 
-    -- Conecta um evento para aplicar a invisibilidade sempre que um novo objeto for adicionado
+    -- Conecta um evento para aplicar a visibilidade sempre que um novo humanoide for adicionado
+    game.Players.PlayerAdded:Connect(function(newPlayer)
+        newPlayer.CharacterAdded:Wait()
+        applyVisibility()
+    end)
+
+    -- Aplicar visibilidade em humanoides que aparecerem depois
     game.Workspace.ChildAdded:Connect(function(child)
-        if child:IsA("Model") or child:IsA("BasePart") then
-            applyInvisibility()
+        if child:IsA("Model") and child:FindFirstChild("Humanoid") then
+            applyVisibility()
         end
     end)
 end)
